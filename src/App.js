@@ -1,12 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { getDatabase, ref, push, set, onChildAdded } from 'firebase/database';
+import 'regenerator-runtime/runtime';
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from 'react-speech-recognition';
 import {
   GoogleAuthProvider,
   getAuth,
   signInWithPopup,
   getRedirectResult,
 } from 'firebase/auth';
-
+import MicTwoToneIcon from '@mui/icons-material/MicTwoTone';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 
@@ -16,6 +20,7 @@ import Footer from './Footer';
 import Header from './Header';
 import img from './send.png';
 import sound from './sound.mp3';
+import MicOffTwoToneIcon from '@mui/icons-material/MicOffTwoTone';
 import './App.css';
 
 function App() {
@@ -23,7 +28,7 @@ function App() {
   const auth = getAuth();
 
   const db = getDatabase();
-
+  const [Mic, setMic] = useState(false);
   const [user, setuser] = useState('');
   const [chats, setchats] = useState([]);
   const audioRef = useRef(null);
@@ -34,6 +39,27 @@ function App() {
   };
 
   //beginning of functions
+
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    finalTranscript,
+    browserSupportsSpeechRecognition,
+  } = useSpeechRecognition();
+  const start = () => {
+    SpeechRecognition.startListening(
+      { continuous: true },
+      { language: 'en-IN' }
+    );
+    console.log(transcript);
+  };
+  const stopMic = () => {
+    SpeechRecognition.stopListening();
+  };
+  if (!browserSupportsSpeechRecognition) {
+    console.error('Speech recognition is not supported in this browser.');
+  }
   const googleLogin = () => {
     signInWithPopup(auth, provider)
       .then((result) => {
@@ -67,7 +93,25 @@ function App() {
     });
     setmessage('');
   };
+  const micCall = () => {
+    setMic(!Mic);
+    resetTranscript();
 
+    setmessage('');
+
+    start();
+    console.log('message is ', transcript);
+
+    // call();
+  };
+  const micOff = () => {
+    setMic(!Mic);
+    console.log('end', transcript);
+    stopMic();
+    setmessage(transcript);
+
+    console.log('end of sound!!!!!!');
+  };
   const updateHeight = () => {
     const element = document.getElementById('chat');
     if (element) {
@@ -83,6 +127,23 @@ function App() {
         updateHeight();
       }, 100);
 
+      if (!browserSupportsSpeechRecognition) {
+        console.error('Speech recognition is not supported in this browser.');
+      }
+      // const micCall = () => {
+      //   setMic(!Mic);
+      //   start();
+      //   console.log('message is 2 ', transcript);
+      //   if (transcript !== '') {
+      //     setmessage(transcript);
+      //   }
+      // };
+      // const micOff = () => {
+      //   setMic(!Mic);
+
+      //   stopMic();
+      //   console.log('end of sound!!!!!!');
+      // };
       playNotificationSound();
     });
 
@@ -125,15 +186,31 @@ function App() {
             {/* </div> */}
             <div>
               <div className="chatbox">
-                <input
-                  placeholder="Type Here ..."
-                  onChange={(e) => setmessage(e.target.value)}
-                  value={messaged}
-                />
-                <button onClick={call}>
-                  <img src={img} />
-                </button>
-                <audio ref={audioRef} src={sound} />
+                <div>
+                  <input
+                    placeholder="Type Here ..."
+                    onChange={(e) => setmessage(e.target.value)}
+                    value={messaged}
+                  />
+                </div>
+                {Mic ? (
+                  <div className="mic">
+                    <MicTwoToneIcon fontSize="large" onClick={micCall} />
+                  </div>
+                ) : (
+                  <div className="mic" onClick={micOff}>
+                    <MicOffTwoToneIcon fontSize="large" />
+                  </div>
+                )}
+                {/* <div className="mic">
+                  <MicTwoToneIcon fontSize="large" />
+                </div> */}
+                <div>
+                  <button onClick={call}>
+                    <img src={img} />
+                  </button>
+                  <audio ref={audioRef} src={sound} />
+                </div>
               </div>
             </div>
           </div>

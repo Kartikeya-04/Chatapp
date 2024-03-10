@@ -31,8 +31,11 @@
   bottom: 2px;
   display: flex;
   flex-direction: row;
+  gap: 2px;
 }
-
+.mic {
+  margin-top: 1rem;
+}
 .chatbox input {
   display: flex;
   flex-wrap: wrap;
