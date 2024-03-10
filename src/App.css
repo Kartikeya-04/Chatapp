@@ -74,11 +74,20 @@
   background-color: burlywood;
   /* background-color: #b4bdff; */
 }
+/* select {
+  background-color: burlywood;
+} */
 .sender .text {
   background-color: rgb(237, 185, 117);
   background-color: #f8bdeb;
   background-color: #83a2ff;
   /* background-color: #435585; */
+}
+.sender select {
+  background-color: #83a2ff;
+}
+.reciever select {
+  background-color: burlywood;
 }
 .head h1 {
   font-size: larger;

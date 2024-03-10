@@ -24,6 +24,8 @@ import MicOffTwoToneIcon from '@mui/icons-material/MicOffTwoTone';
 import './App.css';
 
 function App() {
+  const vRef = useRef(null);
+  const msg = new SpeechSynthesisUtterance();
   const provider = new GoogleAuthProvider();
   const auth = getAuth();
 
@@ -78,13 +80,20 @@ function App() {
         const errorCode = error.code;
         const errorMessage = error.message;
         const email = error.email;
-        // const credential = GoogleAuthProvider.credentialFromError(error);
       });
   };
 
   const chatListRef = ref(db, 'chatss');
   const [messaged, setmessage] = useState('');
 
+  const ApiSpeech = (message, message2) => {
+    // msg.text = vRef.current.textContent;
+    msg.text = message + 'has texted' + message2;
+
+    console.log(msg.text);
+    window.speechSynthesis.speak(msg);
+  };
+  //functions
   const call = () => {
     const newChatRef = push(chatListRef);
     set(newChatRef, {
@@ -130,20 +139,7 @@ function App() {
       if (!browserSupportsSpeechRecognition) {
         console.error('Speech recognition is not supported in this browser.');
       }
-      // const micCall = () => {
-      //   setMic(!Mic);
-      //   start();
-      //   console.log('message is 2 ', transcript);
-      //   if (transcript !== '') {
-      //     setmessage(transcript);
-      //   }
-      // };
-      // const micOff = () => {
-      //   setMic(!Mic);
 
-      //   stopMic();
-      //   console.log('end of sound!!!!!!');
-      // };
       playNotificationSound();
     });
 
@@ -174,7 +170,23 @@ function App() {
                       t.user.email === user.email ? 'sender' : 'reciever'
                     }`}
                   >
-                    <div className="text">
+                    <div
+                      className="text relative"
+                      ref={vRef}
+                      onClick={() => ApiSpeech(t.user.name, t.message.messaged)}
+                    >
+                      {/* <select
+                        className="h-3 absolute w-3 right-0 top-0 mt-3"
+                        onChange={(event) => {
+                          const selectedOption = event.target.value;
+                          if (selectedOption === 'read') {
+                            ApiSpeech(`${t.user.name}: ${t.message.messaged}`);
+                          }
+                        }}
+                      >
+                        <option value="default">Select an action</option>
+                        <option value="read">Read The message</option>
+                      </select> */}
                       <p>
                         <strong>{t.user.name}</strong> : {t.message.messaged}
                       </p>
